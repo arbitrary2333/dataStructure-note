@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    // call，apply特性：改变this指向，第一个参数为null时，视为指向window对象，call和apply的返回值就是函数有返回值
+    /*
+        call、apply、bind区别：
+        call给函数传递的参数是一个参数列表，用，隔开，apply则是数组
+        call和apply调用就会立即执行函数，而bind则不会
+        call和apply的返回值为调用函数的返回值，而bind的返回值
+    */
+    // 第一版
+    Function.prototype.call = function (context) {
+        context.fn = this
+        context.fn()
+        delete context.fn
+    }
+    let obj = {
+        value: 1
+    }
+    function bar() {
+        console.log(this.value)
+    }
+
+    // 第二版:附带参数
+    Function.prototype.call2 = function (context) {
+        context.fn = this;
+        var args = [];
+        for (var i = 1, len = arguments.length; i < len; i++) {
+            args.push('arguments[' + i + ']');
+        }
+        eval('context.fn(' + args + ')');
+        delete context.fn;
+    }
+
+    // 第三版:this参数为null,返回值
+    Function.prototype.call3 = function (context) {
+        var content = context || window
+        context.fn = this
+        var args = []
+        for (var i = 1; i < arguments.length; i++) {
+            args.push('arguments[' + i + ']')
+        }
+        var result = eval('context.fn(' + args + ')')
+        delete context.fn
+        return result
+    }
+</script>
+
+<script>
+    Function.prototype.call = function (context) {
+        var context = context || window
+        context.fn = this
+        var args = []
+        for (var i = 1; i < arguments.length; i++) {
+            args.push('arguments[' + i + ']')
+        }
+        var result = eval('context.fn(' + args + ')')
+        delete context.fn
+        return result
+    }
+
+    var a = {
+        b: 1,
+        c: 2
+    }
+    function fn(d) {
+        return this.b + this.c + d
+    }
+    console.log(fn.call(a, 3))
+</script>

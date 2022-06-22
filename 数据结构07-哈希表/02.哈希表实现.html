@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    // 封装哈希表
+    function HashTable() {
+        this.storage = []
+        this.count = 0
+        this.limit = 7 //最好为质数
+
+        // 哈希函数
+        HashTable.prototype.hashFunc = function (str, size) {
+            // 1.定义hashCode变量
+            var hashCode = 0
+
+            // 2.霍纳算法（秦九韶算法）来计算hashCode的值
+            // cats -> Unicode编码
+            for (var i = 0; i < str.length; i++) {
+                hashCode = 37 * hashCode + str.charCodeAt(i)
+            }
+
+            // 3.取余操作
+            var index = hashCode % size
+
+            return index
+        }
+
+        // 插入&修改操作
+        HashTable.prototype.put = function (key, value) {
+            // 1.根据key获取对应的index
+            var index = this.hashFunc(key, this.limit)
+
+            // 2.根据index取出对应的bucket（桶）
+            var bucket = this.storage[index]
+
+            // 3.判断该bucket是否为空
+            if (bucket == null) {
+                bucket = []
+                this.storage[index] = bucket
+            }
+
+            // 4.判断是否为修改数据
+            for (var i = 0; i < bucket.length; i++) {
+                var tuple = bucket[i]
+                if (tuple[0] == key) {
+                    tuple[1] = value
+                    return
+                }
+            }
+
+            // 5.进行添加操作
+            bucket.push([key, value])
+            this.count += 1
+
+            // 6.判断是否需要扩容操作
+            if (this.count > this.limit * 0.75) {
+                this.resize(this.limit * 2)
+            }
+        }
+
+        // 获取值
+        HashTable.prototype.get = function (key) {
+            // 1.根据key获取对应的index
+            var index = this.hashFunc(key, this.limit)
+
+            // 2.根据对应的index获取bucket
+            var bucket = this.storage[index]
+
+            // 3.判断bucket是否为null
+            if (bucket == null) {
+                return null
+            }
+
+            // 4.有bucket，那么进行线性查找
+            for (var i = 0; i < bucket.length; i++) {
+                var tuple = bucket[i]
+                if (tuple[0] == key) {
+                    return tuple[1]
+                }
+            }
+
+            // 5.依然没有找到key
+            return null
+        }
+
+        // 删除值
+        HashTable.prototype.remove = function (key) {
+            // 1.根据key获取对应的index
+            var index = this.hashFunc(key, this.limit)
+
+            // 2.根据对应的index获取bucket
+            var bucket = this.storage[index]
+
+            // 3.判断bucket是否为null
+            if (bucket == null) {
+                return null
+            }
+
+            // 4.有bucket，那麽就进行线性查找，并且删除
+            for (var i = 0; i < bucket.length; i++) {
+                var tuple = bucket[i]
+                if (tuple[0] == key) {
+                    bucket.splice(i, 1)
+                    this.count--
+
+                    // 判断是否需要缩容操作
+                    if (this.limit > 7 && this.count < this.limit * 0.25) {
+                        this.resize(Math.floor(this.limit / 2))
+                    }
+
+                    return tuple[1]
+                }
+            }
+
+            // 5.依然没有找到，那麽返回null
+            return null
+        }
+
+        // 是否为空
+        HashTable.prototype.isEmpth = function () {
+            return this.count == 0
+        }
+
+        // 表的长度
+        HashTable.prototype.size = function () {
+            return this.count
+        }
+
+        // 哈希表扩容/缩容 装填因子>0.75时扩容，小于0.25时缩容
+        HashTable.prototype.resize = function (newLimit) {
+            // 1.保存旧数组内容
+            var oldStorage = this.storage
+
+            // 2.重置所有属性
+            this.storage = []
+            this.count = 0
+            this.limit = newLimit
+
+            // 3.遍历oldStorage中所有的bucket
+            for (var i = 0; i < oldStorage.length; i++) {
+                // 3.1取出对应的bucket
+                var bucket = oldStorage[i]
+
+                // 3.2判断是否为null
+                if (bucket == null) {
+                    continue
+                }
+
+                // 3.3bucket中有数据，那麽取出数据，重新插入
+                for (var j = 0; j < bucket.length; j++) {
+                    var tuple = bucket[j]
+                    this.put(tuple[0], tuple[1])
+                }
+            }
+        }
+    }
+
+    var ht = new HashTable()
+    ht.put("abc", 123)
+    ht.put("def", 456)
+    ht.put("ghi", 789)
+    ht.put("jkl", 012)
+    ht.put("dwa", 123)
+    ht.put("vsv", 456)
+    ht.put("ewr", 789)
+    ht.put("hum", 012)
+    // ht.remove("abc")
+
+    // console.log(ht.get("vsv"))
+
+    // ht.put("vsv", "老年人")
+
+    // console.log(ht.isEmpth())
+
+    console.log(ht.size())
+
+    // console.log(ht.get("ppp"))
+
+    console.log(ht)
+</script>

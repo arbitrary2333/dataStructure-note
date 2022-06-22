@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="btn">666</div>
+</body>
+
+</html>
+<script>
+    // fn: 构造函数
+    // args:参数
+    function myNew(fn, ...args) {
+        // 定义一个空对象
+        const obj = {}
+        // 隐式原型等于构造函数的显式原型
+        obj.__proto__ = fn.prototype
+        // 执行构造函数，this，指向空对象
+        var result = fn.apply(obj, [...args])
+        // 返回对象
+        return typeof result === 'object' && result != null ? result : obj
+    }
+
+    // 第二种方法
+    function _new() {
+        // 取出构造函数
+        var Func = [].shift.call(arguments)
+        // 创建空对象并赋值prototype
+        var obj = Object.create(Func.prototype)
+        // 执行构造函数，this指向新对象
+        var result = Func.apply(obj, arguments)
+        return typeof result === 'object' && result != null ? result : obj
+    }
+
+    function Person(name, age) {
+        this.name = name
+        this.age = age
+    }
+    let man = myNew(Person, 'longhui', 22)
+    console.log(man)
+</script>

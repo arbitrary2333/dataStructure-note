@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    Function.prototype.apply = function (context, arr) {
+        var content = context || window
+        content.fn = this
+        var result
+        if (!arr) { //不是空时
+            result = context.fn()
+        } else {
+            var args = []
+            for (let i = 0; i < arguments.length; i++) {
+                args.push('arr[' + i + ']')
+            }
+            result = eval('context.fn(' + args + ')')
+        }
+        delete content.fn
+        return result
+    }
+
+    let obj = {
+        value: 1
+    }
+    function bar(name, age) {
+        console.log(name)
+        console.log(age)
+        console.log(this.value)
+    }
+    bar.apply(obj, ['haha', 18])
+</script>
